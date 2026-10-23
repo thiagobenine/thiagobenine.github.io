@@ -34,6 +34,337 @@
   }
   contadorGaleria();
 
+  /* ---------------------------------------------------------- imagem ampliada
+     O quadro de feltro cobre a página com a maior versão da foto. Setas, teclado, deslizar, pinça e
+     toque duplo no celular; fecha com X, Esc, toque fora, deslizar para baixo e o voltar do navegador. */
+  function ampliacao() {
+    var links = $$("[data-amplia]");
+    if (!links.length || !document.body.appendChild) return;
+
+    function svg(d, tam) {
+      return '<svg class="ic" viewBox="0 0 24 24" width="' + tam + '" height="' + tam + '" aria-hidden="true" focusable="false" ' +
+        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + "</svg>";
+    }
+    var itens = links.map(function (a) {
+      var img = $("img", a);
+      var fig = a.closest ? a.closest("figure") : null;
+      var leg = fig ? $("figcaption", fig) : null;
+      return {
+        a: a, img: img, src: a.href,
+        w: Number(a.getAttribute("data-w")) || 1600, h: Number(a.getAttribute("data-h")) || 1067,
+        alt: img ? img.getAttribute("alt") || "" : "", leg: leg ? leg.textContent.trim() : ""
+      };
+    });
+    var total = itens.length;
+    var h1 = document.getElementById("titulo-projeto");
+    var titulo = h1 ? ($(".sr", h1) || h1).textContent.trim() : "";
+
+    var luz = document.createElement("div");
+    luz.className = "luz" + (total === 1 ? " luz-uma" : "");
+    luz.hidden = true;
+    luz.tabIndex = -1;
+    luz.setAttribute("role", "dialog");
+    luz.setAttribute("aria-modal", "true");
+    luz.setAttribute("aria-label", titulo ? "Imagens ampliadas: " + titulo : "Imagens ampliadas do projeto");
+    luz.innerHTML =
+      '<p class="luz-titulo" aria-hidden="true">' + esc(titulo) + "</p>" +
+      '<button type="button" class="luz-botao luz-fecha" aria-label="Fechar a imagem ampliada">' + svg('<path d="M6 6l12 12M18 6 6 18"/>', 22) + "</button>" +
+      '<div class="luz-palco"><img class="luz-img" alt="" draggable="false"></div>' +
+      '<p class="luz-legenda" aria-hidden="true"></p>' +
+      '<button type="button" class="luz-botao luz-seta luz-ant" aria-label="Imagem anterior">' + svg('<path d="M19 12H5M11 6l-6 6 6 6"/>', 22) + "</button>" +
+      '<p class="luz-conta" aria-hidden="true"><span class="luz-n"></span><span class="luz-de"> / ' + total + "</span></p>" +
+      '<button type="button" class="luz-botao luz-seta luz-prox" aria-label="Próxima imagem">' + svg('<path d="M5 12h14M13 6l6 6-6 6"/>', 22) + "</button>" +
+      '<p class="sr" aria-live="polite" aria-atomic="true"></p>';
+    document.body.appendChild(luz);
+
+    var palco = $(".luz-palco", luz);
+    var foto = $(".luz-img", luz);
+    var legenda = $(".luz-legenda", luz);
+    var numero = $(".luz-n", luz);
+    var fecha = $(".luz-fecha", luz);
+    var ant = $(".luz-ant", luz);
+    var prox = $(".luz-prox", luz);
+    var aviso = $("[aria-live]", luz);
+
+    var aberto = false, empurrou = false, focoAntes = null, inertes = [];
+    var atual = 0;
+    var s = 1, tx = 0, ty = 0;       /* zoom e deslocamento da foto */
+    var W = 0, H = 0, iw = 0, ih = 0; /* palco e foto encaixada */
+    var MAX = 4;
+
+    function aplica(anima) {
+      foto.style.transition = anima && !reduz.matches ? "transform .22s cubic-bezier(.16, 1, .3, 1), opacity .2s" : "none";
+      foto.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + s + ")";
+    }
+    function limita() {
+      var mx = Math.max(0, (iw * s - W) / 2);
+      var my = Math.max(0, (ih * s - H) / 2);
+      tx = Math.min(mx, Math.max(-mx, tx));
+      ty = Math.min(my, Math.max(-my, ty));
+    }
+    function encaixa() {
+      var it = itens[atual];
+      W = palco.clientWidth;
+      H = palco.clientHeight;
+      var r = Math.min(W / it.w, H / it.h, 2);
+      iw = Math.round(it.w * r);
+      ih = Math.round(it.h * r);
+      foto.style.width = iw + "px";
+      foto.style.height = ih + "px";
+      s = 1; tx = 0; ty = 0;
+      foto.style.opacity = "";
+      aplica(false);
+    }
+
+    var precarregadas = {};
+    function precarrega(k) {
+      if (k < 0 || k >= total || precarregadas[k]) return;
+      precarregadas[k] = new Image();
+      precarregadas[k].src = itens[k].src;
+    }
+
+    function mostra(direcao) {
+      var it = itens[atual];
+      encaixa();
+      /* começa com a versão que a página já baixou e troca pela maior quando ela chega */
+      var ja = it.img && it.img.complete && it.img.naturalWidth ? (it.img.currentSrc || it.img.src) : "";
+      foto.alt = it.alt;
+      if (ja && ja !== it.src) {
+        foto.src = ja;
+        var grande = precarregadas[atual] || new Image();
+        precarregadas[atual] = grande;
+        var troca = function () { if (itens[atual] === it && aberto) foto.src = it.src; };
+        if (grande.complete && grande.naturalWidth) troca();
+        else { grande.addEventListener("load", troca); if (!grande.src) grande.src = it.src; }
+      } else {
+        foto.src = it.src;
+      }
+      legenda.textContent = it.leg;
+      legenda.hidden = !it.leg;
+      var n = String(atual + 1);
+      numero.innerHTML = n.split("").map(function (c, k) { return '<span class="l" style="--i:' + k + '">' + c + "</span>"; }).join("");
+      if (direcao && !reduz.matches) {
+        numero.classList.remove("assentando");
+        foto.classList.remove("entra-prox", "entra-ant");
+        void foto.offsetWidth;
+        numero.classList.add("assentando");
+        foto.classList.add(direcao > 0 ? "entra-prox" : "entra-ant");
+      }
+      var focado = document.activeElement;
+      ant.disabled = atual === 0;
+      prox.disabled = atual === total - 1;
+      /* a seta que acabou de apagar estava com o foco: ele passa para a outra */
+      if (focado && focado.disabled) (prox.disabled ? (ant.disabled ? fecha : ant) : prox).focus();
+      aviso.textContent = "Imagem " + n + " de " + total + (it.leg ? ". " + it.leg : "");
+      precarrega(atual + 1);
+      precarrega(atual - 1);
+    }
+
+    function vai(k) {
+      if (k < 0 || k >= total) { tx = 0; ty = 0; aplica(true); return; }
+      var direcao = k > atual ? 1 : -1;
+      atual = k;
+      mostra(direcao);
+    }
+
+    function abre(k) {
+      if (aberto) return;
+      aberto = true;
+      atual = k;
+      focoAntes = document.activeElement;
+      luz.hidden = false;
+      document.documentElement.classList.add("luz-aberta");
+      inertes = [];
+      Array.prototype.forEach.call(document.body.children, function (el) {
+        if (el !== luz && !el.inert && el.tagName !== "SCRIPT") { el.inert = true; el.setAttribute("aria-hidden", "true"); inertes.push(el); }
+      });
+      mostra(0);
+      luz.focus({ preventScroll: true });
+      try { history.pushState({ luz: true }, ""); empurrou = true; } catch (e) { empurrou = false; }
+    }
+
+    function desmonta() {
+      if (!aberto) return;
+      aberto = false;
+      luz.hidden = true;
+      document.documentElement.classList.remove("luz-aberta");
+      inertes.forEach(function (el) { el.inert = false; el.removeAttribute("aria-hidden"); });
+      inertes = [];
+      /* o foco volta para a foto em que a pessoa parou, e a galeria mostra essa foto */
+      var alvo = itens[atual].a;
+      if (alvo.scrollIntoView) alvo.scrollIntoView({ block: "nearest", inline: "center" });
+      (alvo || focoAntes).focus({ preventScroll: true });
+    }
+
+    function fechaLuz() {
+      if (!aberto) return;
+      desmonta();
+      if (empurrou) { empurrou = false; history.back(); }
+    }
+
+    window.addEventListener("popstate", function () {
+      if (aberto) { empurrou = false; desmonta(); }
+    });
+
+    links.forEach(function (a, k) {
+      a.addEventListener("click", function (ev) {
+        if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button > 0) return;
+        ev.preventDefault();
+        abre(k);
+      });
+    });
+    fecha.addEventListener("click", fechaLuz);
+    ant.addEventListener("click", function () { vai(atual - 1); });
+    prox.addEventListener("click", function () { vai(atual + 1); });
+    /* toque ou clique no feltro, fora da foto e dos botões, fecha (menos o clique que termina um arrasto) */
+    var arrastou = false;
+    luz.addEventListener("click", function (ev) {
+      if (arrastou) { arrastou = false; return; }
+      if (ev.target === luz || ev.target === palco) fechaLuz();
+    });
+
+    document.addEventListener("keydown", function (ev) {
+      if (!aberto) return;
+      if (ev.key === "Escape") { ev.preventDefault(); fechaLuz(); return; }
+      if (ev.key === "ArrowLeft") { ev.preventDefault(); vai(atual - 1); return; }
+      if (ev.key === "ArrowRight") { ev.preventDefault(); vai(atual + 1); return; }
+      if (ev.key === "Home") { ev.preventDefault(); if (atual > 0) vai(0); return; }
+      if (ev.key === "End") { ev.preventDefault(); if (atual < total - 1) vai(total - 1); return; }
+      if (ev.key === "Tab") {
+        var f = [fecha, ant, prox].filter(function (b) { return !b.disabled && b.offsetParent !== null; });
+        if (!f.length) { ev.preventDefault(); return; }
+        var primeiro = f[0], ultimo = f[f.length - 1], ativo = document.activeElement;
+        if (ev.shiftKey && (ativo === primeiro || ativo === luz)) { ev.preventDefault(); ultimo.focus(); }
+        else if (!ev.shiftKey && (ativo === ultimo || f.indexOf(ativo) < 0)) { ev.preventDefault(); primeiro.focus(); }
+      }
+    });
+
+    window.addEventListener("resize", function () {
+      if (aberto && (palco.clientWidth !== W || palco.clientHeight !== H)) encaixa();
+    });
+
+    /* ---- gestos: deslizar troca a foto, pinça e toque duplo dão zoom, arrastar com zoom move a foto */
+    var dedos = {};
+    var gesto = null;
+    var ultimoToque = null;
+
+    function centro() {
+      var r = palco.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    function doisDedos() {
+      var ids = Object.keys(dedos);
+      var a = dedos[ids[0]], b = dedos[ids[1]];
+      var c = centro();
+      return { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, x: (a.x + b.x) / 2 - c.x, y: (a.y + b.y) / 2 - c.y };
+    }
+    function zoomEm(px, py, novo) {
+      var qx = (px - tx) / s, qy = (py - ty) / s;
+      s = novo;
+      tx = px - s * qx;
+      ty = py - s * qy;
+      limita();
+    }
+
+    palco.addEventListener("pointerdown", function (ev) {
+      if (ev.pointerType === "mouse" && ev.button !== 0) return;
+      if (ev.pointerType === "mouse") ev.preventDefault();
+      arrastou = false;
+      dedos[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      var n = Object.keys(dedos).length;
+      if (n === 2) {
+        var p = doisDedos();
+        gesto = { tipo: "pinca", d0: p.d, s0: s, qx: (p.x - tx) / s, qy: (p.y - ty) / s };
+        arrastou = true;
+      } else if (n === 1) {
+        gesto = { tipo: "um", x0: ev.clientX, y0: ev.clientY, tx0: tx, ty0: ty, t0: Date.now(), eixo: null, alvo: ev.target, tipoPonteiro: ev.pointerType };
+      }
+    });
+
+    /* movimento e soltura ouvidos na janela: o arrasto pode sair do palco sem perder o fim */
+    window.addEventListener("pointermove", function (ev) {
+      if (!dedos[ev.pointerId] || !gesto) return;
+      dedos[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      if (gesto.tipo === "pinca" && Object.keys(dedos).length >= 2) {
+        var p = doisDedos();
+        s = Math.min(MAX, Math.max(1, gesto.s0 * p.d / gesto.d0));
+        tx = p.x - s * gesto.qx;
+        ty = p.y - s * gesto.qy;
+        limita();
+        aplica(false);
+        return;
+      }
+      if (gesto.tipo !== "um") return;
+      var dx = ev.clientX - gesto.x0, dy = ev.clientY - gesto.y0;
+      if (!gesto.eixo) {
+        if (Math.hypot(dx, dy) < 8) return;
+        gesto.eixo = s > 1.01 ? "mover" : Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+        arrastou = true;
+      }
+      if (gesto.eixo === "mover") {
+        tx = gesto.tx0 + dx;
+        ty = gesto.ty0 + dy;
+        limita();
+      } else if (gesto.eixo === "x") {
+        var semVizinha = (dx > 0 && atual === 0) || (dx < 0 && atual === total - 1);
+        tx = semVizinha ? dx * 0.3 : dx;
+      } else {
+        ty = dy > 0 ? dy : dy * 0.25;
+        foto.style.opacity = String(1 - Math.min(Math.abs(ty) / 600, 0.4));
+      }
+      aplica(false);
+    });
+
+    function solta(ev) {
+      if (!dedos[ev.pointerId]) return;
+      delete dedos[ev.pointerId];
+      var resta = Object.keys(dedos);
+      if (!gesto) return;
+      if (gesto.tipo === "pinca") {
+        if (resta.length === 1) {
+          var d = dedos[resta[0]];
+          gesto = { tipo: "um", x0: d.x, y0: d.y, tx0: tx, ty0: ty, t0: 0, eixo: "mover" };
+        } else if (!resta.length) {
+          if (s < 1.05) { s = 1; tx = 0; ty = 0; aplica(true); }
+          gesto = null;
+        }
+        return;
+      }
+      if (resta.length) return;
+      var g = gesto;
+      gesto = null;
+      var dx = ev.clientX - g.x0, dy = ev.clientY - g.y0;
+      var dt = Math.max(1, Date.now() - g.t0);
+      if (!g.eixo) {
+        if (ev.type === "pointercancel" || dt > 500) return;
+        /* toque no feltro: quem fecha é o clique; na foto, só o toque duplo faz algo */
+        if (g.alvo !== foto || g.tipoPonteiro === "mouse") return;
+        var agora = Date.now();
+        if (ultimoToque && agora - ultimoToque.t < 320 && Math.hypot(ev.clientX - ultimoToque.x, ev.clientY - ultimoToque.y) < 32) {
+          ultimoToque = null;
+          var c = centro();
+          if (s > 1.01) { s = 1; tx = 0; ty = 0; } else zoomEm(ev.clientX - c.x, ev.clientY - c.y, 2.5);
+          aplica(true);
+        } else {
+          ultimoToque = { t: agora, x: ev.clientX, y: ev.clientY };
+        }
+        return;
+      }
+      if (g.eixo === "x") {
+        var rapido = Math.abs(dx) / dt > 0.5 && Math.abs(dx) > 30;
+        if ((dx < -70 || (rapido && dx < 0)) && atual < total - 1) vai(atual + 1);
+        else if ((dx > 70 || (rapido && dx > 0)) && atual > 0) vai(atual - 1);
+        else { tx = 0; aplica(true); }
+      } else if (g.eixo === "y") {
+        if (dy > 120 || (dy > 40 && dy / dt > 0.6)) fechaLuz();
+        else { ty = 0; foto.style.opacity = ""; aplica(true); }
+      }
+    }
+    window.addEventListener("pointerup", solta);
+    window.addEventListener("pointercancel", solta);
+  }
+  ampliacao();
+
   var noIndice = document.getElementById("indice");
   if (!noIndice) return;
   var D;
