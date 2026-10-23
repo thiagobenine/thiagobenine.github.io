@@ -35,7 +35,7 @@
   contadorGaleria();
 
   /* ---------------------------------------------------------- imagem ampliada
-     O quadro de feltro cobre a página com a maior versão da foto. Setas, teclado, deslizar, pinça e
+     Um fundo escuro cobre a página com a maior versão da foto. Setas, teclado, deslizar, pinça e
      toque duplo no celular; fecha com X, Esc, toque fora, deslizar para baixo e o voltar do navegador. */
   function ampliacao() {
     var links = $$("[data-amplia]");
@@ -142,12 +142,10 @@
       legenda.textContent = it.leg;
       legenda.hidden = !it.leg;
       var n = String(atual + 1);
-      numero.innerHTML = n.split("").map(function (c, k) { return '<span class="l" style="--i:' + k + '">' + c + "</span>"; }).join("");
+      numero.textContent = n;
       if (direcao && !reduz.matches) {
-        numero.classList.remove("assentando");
         foto.classList.remove("entra-prox", "entra-ant");
         void foto.offsetWidth;
-        numero.classList.add("assentando");
         foto.classList.add(direcao > 0 ? "entra-prox" : "entra-ant");
       }
       var focado = document.activeElement;
@@ -216,7 +214,7 @@
     fecha.addEventListener("click", fechaLuz);
     ant.addEventListener("click", function () { vai(atual - 1); });
     prox.addEventListener("click", function () { vai(atual + 1); });
-    /* toque ou clique no feltro, fora da foto e dos botões, fecha (menos o clique que termina um arrasto) */
+    /* toque ou clique no fundo, fora da foto e dos botões, fecha (menos o clique que termina um arrasto) */
     var arrastou = false;
     luz.addEventListener("click", function (ev) {
       if (arrastou) { arrastou = false; return; }
@@ -337,7 +335,7 @@
       var dt = Math.max(1, Date.now() - g.t0);
       if (!g.eixo) {
         if (ev.type === "pointercancel" || dt > 500) return;
-        /* toque no feltro: quem fecha é o clique; na foto, só o toque duplo faz algo */
+        /* toque no fundo: quem fecha é o clique; na foto, só o toque duplo faz algo */
         if (g.alvo !== foto || g.tipoPonteiro === "mouse") return;
         var agora = Date.now();
         if (ultimoToque && agora - ultimoToque.t < 320 && Math.hypot(ev.clientX - ultimoToque.x, ev.clientY - ultimoToque.y) < 32) {
@@ -461,6 +459,7 @@
   var cards = {};
   $$(".painel[data-slug]", galeria).forEach(function (c) { cards[c.getAttribute("data-slug")] = c; });
   var secao = document.getElementById("projetos");
+  var destaques = $("section.destaques");
   var frase = $("#frase .frase-letras");
   var fraseSr = $("[data-frase-sr]");
   var anuncio = $("[data-anuncio]");
@@ -479,28 +478,18 @@
   var campo = document.getElementById("busca");
   var limpaBusca = $("[data-limpa-busca]");
 
-  /* ---------------------------------------------------------- frase do quadro, em letras */
+  /* ---------------------------------------------------------- frase da faixa, em trechos com tom próprio */
   function letras(segmentos) {
-    var i = 0;
     var html = "";
     segmentos.forEach(function (seg, k) {
-      var palavras = String(seg.t).split(" ");
-      var dentro = palavras.map(function (p) {
-        var s = "";
-        for (var c = 0; c < p.length; c++) {
-          s += '<span class="l" style="--i:' + Math.min(i, 40) + '">' + esc(p[c]) + "</span>";
-          i++;
-        }
-        i++;
-        return '<span class="p">' + s + "</span>";
-      }).join(" ");
-      if (k > 0) html += seg.cola ? " " : " ";
+      var dentro = esc(String(seg.t));
+      if (k > 0) html += seg.cola ? "\u00a0" : " ";
       html += seg.c ? '<span class="' + seg.c + '">' + dentro + "</span>" : dentro;
     });
     return html;
   }
 
-  /* a frase do quadro se lê como pedido: "8 projetos de sites e lojas virtuais em WordPress" */
+  /* a frase da faixa se lê como pedido: "8 projetos de sites e lojas virtuais em WordPress" */
   var LIGA = { area: "de", tipo: "do tipo", ferramenta: "em", setor: "do setor", formato: "no formato" };
   function segmentosDaFrase(n) {
     var segs = [{ t: String(n), c: "fn" }, { t: n === 1 ? "projeto" : "projetos" }];
@@ -535,11 +524,6 @@
     if (fraseSr) fraseSr.textContent = texto;
     if (frase) {
       frase.innerHTML = letras(segs);
-      if (anima && !reduz.matches) {
-        frase.classList.remove("assentando");
-        void frase.offsetWidth;
-        frase.classList.add("assentando");
-      }
     }
     if (anima && anuncio) {
       clearTimeout(tAnuncio);
@@ -601,6 +585,8 @@
 
     var nAtivos = ativos();
     if (qtd) { qtd.textContent = String(nAtivos); qtd.hidden = nAtivos === 0; }
+    /* com busca ou filtro, os resultados sobem: os destaques saem da frente */
+    if (destaques) destaques.hidden = nAtivos > 0 || !!E.q;
     if (botaoFiltros) botaoFiltros.setAttribute("aria-label", nAtivos ? "Filtros, " + nAtivos + " marcado" + (nAtivos > 1 ? "s" : "") : "Filtros");
 
     desenhaAtivos();
