@@ -573,6 +573,25 @@ a:hover { text-decoration-thickness: 2px; }
 }
 .comanda-n { color: var(--preco-parede); font-variant-numeric: tabular-nums; }
 .ficha { margin: 0; }
+/* avaliação no alto da ficha: o que o cliente achou, antes dos dados técnicos */
+.ficha-aval {
+  margin: 4px 0 6px; padding: 14px 14px 13px;
+  background: #FFF3C4; border-radius: 4px;
+}
+.ficha-aval-cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin: 0; }
+.ficha-aval-rot { color: var(--tinta-2); font-size: .75rem; font-stretch: 86%; font-weight: 640; letter-spacing: .08em; text-transform: uppercase; }
+.ficha-aval-nota { display: inline-flex; align-items: center; gap: 8px; }
+.ficha-aval-nota .estrela { stroke: #B8860B; }
+.ficha-aval-nota .estrela.cheia { fill: #F5B700; }
+.ficha-aval-n { font-weight: 760; font-variant-numeric: tabular-nums; }
+.ficha-aval-txt { margin: 10px 0 0; }
+.ficha-aval-txt p {
+  margin: 0; font-size: 1.0625rem; line-height: 1.35; font-stretch: 92%; font-weight: 640; text-wrap: pretty;
+}
+.ficha-aval-txt p::before { content: "\201C"; }
+.ficha-aval-txt p::after { content: "\201D"; }
+.ficha-aval-mais { display: inline-block; margin-top: 8px; font-size: .875rem; font-weight: 560; color: var(--tinta-2); text-decoration-color: rgba(20, 22, 20, .3); }
+.ficha-aval-mais:hover { color: var(--tinta); text-decoration-color: currentColor; }
 .ficha-linha { display: flex; align-items: baseline; gap: 10px; padding-block: 9px; border-bottom: 1px dashed #D4DBD7; }
 .ficha-linha:last-child { border-bottom: 0; }
 .ficha dt {
