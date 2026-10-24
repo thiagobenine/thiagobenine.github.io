@@ -1,9 +1,10 @@
-/* Portfólio Thiago Benine: busca, filtros combináveis com contagem prévia e estado na URL. Sem dependências. */
+/* Portfólio Thiago Benine, versão Comando: menu do celular, imagem ampliada, busca com resultados na paleta,
+   filtros combináveis com contagem prévia e estado na URL. Sem dependências. */
 (function () {
   "use strict";
 
   var reduz = window.matchMedia("(prefers-reduced-motion: reduce)");
-  var celular = window.matchMedia("(max-width: 899px)");
+  var celular = window.matchMedia("(max-width: 959px)");
   var estreito = window.matchMedia("(max-width: 767px)");
 
   function $(sel, raiz) { return (raiz || document).querySelector(sel); }
@@ -16,23 +17,6 @@
   function rola(y) {
     window.scrollTo({ top: Math.max(0, y), behavior: reduz.matches ? "auto" : "smooth" });
   }
-
-  /* ---------------------------------------------------------- galeria da página de projeto */
-  function contadorGaleria() {
-    var fotos = $("[data-fotos]");
-    var atual = $("[data-atual]");
-    if (!fotos || !atual || !("IntersectionObserver" in window)) return;
-    var figs = $$(".foto", fotos);
-    var visivel = figs.map(function () { return 0; });
-    var obs = new IntersectionObserver(function (entradas) {
-      entradas.forEach(function (e) { visivel[figs.indexOf(e.target)] = e.intersectionRatio; });
-      var melhor = 0;
-      visivel.forEach(function (r, i) { if (r > visivel[melhor] + 0.01) melhor = i; });
-      atual.textContent = String(melhor + 1);
-    }, { root: fotos, threshold: [0, 0.25, 0.5, 0.75, 1] });
-    figs.forEach(function (f) { obs.observe(f); });
-  }
-  contadorGaleria();
 
   /* ---------------------------------------------------------- imagem ampliada
      Um fundo escuro cobre a página com a maior versão da foto. Setas, teclado, deslizar, pinça e
@@ -49,10 +33,11 @@
       var img = $("img", a);
       var fig = a.closest ? a.closest("figure") : null;
       var leg = fig ? $("figcaption", fig) : null;
+      var legTxt = a.getAttribute("data-leg") || (leg ? leg.textContent.trim() : "");
       return {
         a: a, img: img, src: a.href,
         w: Number(a.getAttribute("data-w")) || 1600, h: Number(a.getAttribute("data-h")) || 1067,
-        alt: img ? img.getAttribute("alt") || "" : "", leg: leg ? leg.textContent.trim() : ""
+        alt: img ? img.getAttribute("alt") || "" : "", leg: legTxt
       };
     });
     var total = itens.length;
@@ -363,6 +348,40 @@
   }
   ampliacao();
 
+  /* ---------------------------------------------------------- menu do celular e atalho de busca */
+  (function menu() {
+    var nav = $(".nav");
+    var bm = $(".nav .bm");
+    if (!nav || !bm) return;
+    function poe(aberto) {
+      nav.classList.toggle("aberto", aberto);
+      bm.setAttribute("aria-expanded", aberto ? "true" : "false");
+      bm.setAttribute("aria-label", aberto ? "Fechar menu" : "Menu");
+    }
+    bm.addEventListener("click", function () { poe(!nav.classList.contains("aberto")); });
+    $$(".links a", nav).forEach(function (a) { a.addEventListener("click", function () { poe(false); }); });
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && nav.classList.contains("aberto")) { poe(false); bm.focus(); }
+    });
+    var aoMudar = function () { if (!celular.matches) poe(false); };
+    if (celular.addEventListener) celular.addEventListener("change", aoMudar);
+  })();
+  (function atalho() {
+    var campo = document.getElementById("busca");
+    if (!campo) return;
+    var mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || "");
+    $$("[data-tecla]").forEach(function (k) { if (mac) k.textContent = "⌘"; });
+    document.addEventListener("keydown", function (ev) {
+      if ((ev.ctrlKey || ev.metaKey) && !ev.altKey && (ev.key === "k" || ev.key === "K")) {
+        ev.preventDefault();
+        var r = campo.getBoundingClientRect();
+        if (r.top < 0 || r.bottom > window.innerHeight) rola(r.top + window.pageYOffset - 120);
+        campo.focus({ preventScroll: true });
+        campo.select();
+      }
+    });
+  })();
+
   var noIndice = document.getElementById("indice");
   if (!noIndice) return;
   var D;
@@ -448,6 +467,15 @@
     return { sel: sel, alts: termos(q).map(alternativas) };
   }
 
+  var porSlug = {};
+  D.itens.forEach(function (it) { porSlug[it.s] = it; });
+  function relevancia(it, est) {
+    if (!it || !it.t) return 0;
+    var n = 0;
+    est.alts.forEach(function (alts) { if (alts.some(function (a) { return it.t.indexOf(a) >= 0; })) n++; });
+    return n;
+  }
+
   function conta(est) {
     var n = 0;
     D.itens.forEach(function (it) { if (casa(it, est, null)) n++; });
@@ -455,11 +483,19 @@
   }
 
   /* ---------------------------------------------------------- elementos */
-  var galeria = $("[data-galeria]");
-  var cards = {};
-  $$(".painel[data-slug]", galeria).forEach(function (c) { cards[c.getAttribute("data-slug")] = c; });
   var secao = document.getElementById("projetos");
-  var destaques = $("section.destaques");
+  var cards = {};
+  $$("[data-slug]", secao || document).forEach(function (c) { cards[c.getAttribute("data-slug")] = c; });
+  var grades = $$(".grade", secao || document).map(function (el) {
+    return { el: el, ordem: $$(".pc[data-slug]", el) };
+  });
+  var todosLink = $("[data-todos]");
+  var seg = $(".seg");
+  var palRes = $("[data-pal-res]");
+  var palNada = $("[data-pal-nada]");
+  var palLista = document.getElementById("pal-lista");
+  var palGl = $(".pal .gl");
+  var noIndiceGeral = !!(secao && secao.classList.contains("indice-projetos"));
   var frase = $("#frase .frase-letras");
   var fraseSr = $("[data-frase-sr]");
   var anuncio = $("[data-anuncio]");
@@ -471,8 +507,7 @@
   var qtd = $(".filtros-qtd");
   var painel = document.getElementById("filtros");
   var veu = $("[data-veu]");
-  var linhas = $$(".cardapio .linha[data-grupo]");
-  var cardapio = $(".cardapio");
+  var linhas = $$(".tipo-link[data-grupo]");
   var chips = $$(".chip[data-grupo]");
   var form = $("[data-busca]");
   var campo = document.getElementById("busca");
@@ -489,10 +524,10 @@
     return html;
   }
 
-  /* a frase da faixa se lê como pedido: "8 projetos de sites e lojas virtuais em WordPress" */
+  /* a frase da faixa se lê como pedido: "8 trabalhos de sites e lojas virtuais em WordPress" */
   var LIGA = { area: "de", tipo: "do tipo", ferramenta: "em", setor: "do setor", formato: "no formato" };
   function segmentosDaFrase(n) {
-    var segs = [{ t: String(n), c: "fn" }, { t: n === 1 ? "projeto" : "projetos" }];
+    var segs = [{ t: String(n), c: "fn" }, { t: n === 1 ? "trabalho" : "trabalhos" }];
     G.forEach(function (g) {
       var sel = E.sel[g];
       if (!sel.length) return;
@@ -507,6 +542,7 @@
       segs.push({ t: "com", c: "fsep" });
       segs.push({ t: "“" + E.q + "”", c: "fsel" });
     }
+    if (noIndiceGeral && segs.length === 2 && D.areas) segs.push({ t: "neste portfólio, em " + D.areas + " áreas", c: "fsep" });
     return segs;
   }
 
@@ -541,6 +577,26 @@
       var c = cards[it.s];
       if (c) c.hidden = !ok;
     });
+    /* com busca, o que casa no título e no tipo vem primeiro; sem busca, volta a ordem do build */
+    grades.forEach(function (g) {
+      var ordem = g.ordem.slice();
+      if (est.alts.length) {
+        var pos = new Map();
+        ordem.forEach(function (c, i) { pos.set(c, i); });
+        ordem.sort(function (x, y) {
+          return relevancia(porSlug[y.getAttribute("data-slug")], est) - relevancia(porSlug[x.getAttribute("data-slug")], est) || pos.get(x) - pos.get(y);
+        });
+      }
+      var atual = $$(".pc[data-slug]", g.el);
+      if (ordem.some(function (c, i) { return atual[i] !== c; })) ordem.forEach(function (c) { g.el.appendChild(c); });
+      g.el.hidden = !ordem.some(function (c) { return !c.hidden; });
+    });
+    if (seg) seg.classList.toggle("com-tipo", !!(E.sel.tipo && E.sel.tipo.length));
+    if (todosLink) {
+      var semTipo = !(E.sel.tipo && E.sel.tipo.length);
+      todosLink.classList.toggle("on", semTipo);
+      if (semTipo) todosLink.setAttribute("aria-current", "true"); else todosLink.removeAttribute("aria-current");
+    }
 
     /* contagem prévia: quantos sobram se escolher este valor, mantendo os outros grupos */
     var cont = {};
@@ -575,23 +631,24 @@
       ln.classList.toggle("apagada", !acesa && n === 0);
       if (acesa) ln.setAttribute("aria-current", "true"); else ln.removeAttribute("aria-current");
       if (!acesa && n === 0) ln.setAttribute("aria-disabled", "true"); else ln.removeAttribute("aria-disabled");
-      var nEl = $(".linha-n", ln);
+      var nEl = $(".num", ln);
       if (nEl) nEl.textContent = String(n);
     });
-    if (cardapio) cardapio.classList.toggle("tem-escolha", temEscolha);
+
 
     $$("[data-total]").forEach(function (el) { el.textContent = String(total); });
-    $$("[data-total-rot]").forEach(function (el) { el.textContent = total === 1 ? "projeto" : "projetos"; });
+    $$("[data-total-rot]").forEach(function (el) { el.textContent = total === 1 ? "trabalho" : "trabalhos"; });
 
     var nAtivos = ativos();
     if (qtd) { qtd.textContent = String(nAtivos); qtd.hidden = nAtivos === 0; }
-    /* com busca ou filtro, os resultados sobem: os destaques saem da frente */
-    if (destaques) destaques.hidden = nAtivos > 0 || !!E.q;
+    /* no índice, com busca ou filtro, os resultados entram no lugar da prancha de áreas */
+    if (secao) secao.classList.toggle("filtrando", nAtivos > 0 || !!E.q);
     if (botaoFiltros) botaoFiltros.setAttribute("aria-label", nAtivos ? "Filtros, " + nAtivos + " marcado" + (nAtivos > 1 ? "s" : "") : "Filtros");
 
     desenhaAtivos();
     desenhaVazio(total);
     mostraFrase(total, anima);
+    desenhaPaleta(est, total);
     if (limpaBusca) limpaBusca.hidden = !(campo && campo.value);
     gravaUrl();
   }
@@ -651,7 +708,7 @@
   function desenhaVazio(total) {
     if (!vazio) return;
     vazio.hidden = total > 0;
-    if (galeria) galeria.hidden = total === 0;
+    if (total === 0) grades.forEach(function (g) { g.el.hidden = true; });
     if (total > 0 || !vazioOpcoes) return;
     var opcoes = [];
     G.forEach(function (g) {
@@ -746,6 +803,82 @@
     if (painel && !painel.hidden && !celular.matches && !alvo.closest("#filtros") && !alvo.closest(".botao-filtros")) fechaPainel(false);
   });
 
+  /* lista da página inicial: abre os trabalhos que ficaram depois dos 12 primeiros */
+  $$("[data-dobra-btn]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var lista = b.closest(".lista");
+      if (!lista) return;
+      lista.classList.add("aberta");
+      var prox = $$(".pc:not([hidden]) a", lista)[12];
+      if (prox) prox.focus();
+    });
+  });
+
+  if (todosLink) {
+    todosLink.addEventListener("click", function (ev) {
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button > 0) return;
+      ev.preventDefault();
+      E.sel.tipo = [];
+      atualiza(true);
+    });
+  }
+
+  /* ---------------------------------------------------------- resultados na paleta da página inicial */
+  var SETA = '<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 11.5l7-7M6 4.5h5.5V10" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+  var prefixo = (form && form.getAttribute("data-prefixo")) || "";
+  function desenhaPaleta(est, total) {
+    if (!palRes) return;
+    var q = campo ? campo.value.trim() : "";
+    var digitando = !!q;
+    if (palLista) palLista.hidden = digitando;
+    if (palGl) palGl.hidden = digitando;
+    if (!digitando) { palRes.hidden = true; if (palNada) palNada.hidden = true; palRes.innerHTML = ""; return; }
+    var achados = D.itens.filter(function (it) { return casa(it, est, null); });
+    if (est.alts.length) {
+      var pos = new Map();
+      achados.forEach(function (it, i) { pos.set(it, i); });
+      achados.sort(function (x, y) { return relevancia(y, est) - relevancia(x, est) || pos.get(x) - pos.get(y); });
+    }
+    var html = achados.slice(0, 6).map(function (it) {
+      var img = it.h ? '<img src="' + esc(prefixo + it.h) + '" alt="" width="50" height="50" loading="lazy">' : '<span class="tk"></span>';
+      return '<a class="it" href="' + esc(prefixo + "projeto/" + it.s + "/") + '">' + img + "<div><b>" + esc(it.n) + "</b><span>" + esc(it.a) + "</span></div>" +
+        '<span class="r ic">' + SETA + "</span></a>";
+    }).join("");
+    if (total > 0) {
+      html += '<a class="it vertudo" href="#projetos"><b>Ver ' + (total === 1 ? "o resultado" : "os " + total + " resultados") + "</b>" +
+        '<span class="seta">' + SETA + "</span></a>";
+    }
+    palRes.innerHTML = html;
+    palRes.hidden = total === 0;
+    if (palNada) {
+      palNada.hidden = total > 0;
+      if (total === 0) palNada.textContent = "Nenhum trabalho com “" + q + "”. Tente outra palavra ou escolha uma área.";
+    }
+  }
+  if (palRes) {
+    palRes.addEventListener("click", function (ev) {
+      var vt = ev.target.closest && ev.target.closest(".vertudo");
+      if (!vt) return;
+      ev.preventDefault();
+      vaiParaProjetos();
+    });
+  }
+  /* setas e Enter percorrem a paleta como numa paleta de comandos */
+  if (campo && $(".pal")) {
+    $(".pal").addEventListener("keydown", function (ev) {
+      if (ev.key !== "ArrowDown" && ev.key !== "ArrowUp") return;
+      var caixa = palRes && !palRes.hidden ? palRes : palLista;
+      if (!caixa || caixa.hidden) return;
+      var itens = $$("a.it", caixa);
+      if (!itens.length) return;
+      var i = itens.indexOf(document.activeElement);
+      ev.preventDefault();
+      if (ev.key === "ArrowDown") (i < 0 ? itens[0] : itens[Math.min(itens.length - 1, i + 1)]).focus();
+      else if (i <= 0) campo.focus();
+      else itens[i - 1].focus();
+    });
+  }
+
   /* depois de tirar um filtro o botão some; o foco vai para o primeiro que sobrou ou para o botão Filtros */
   function focoDepoisDeTirar() {
     var prox = caixaAtivos && $(".ativo", caixaAtivos);
@@ -833,7 +966,7 @@
       ver.addEventListener("click", function () {
         fechaPainel(false);
         vaiParaProjetos();
-        var primeiro = galeria && $(".painel:not([hidden]) a", galeria);
+        var primeiro = $(".pc:not([hidden]) a", secao);
         if (primeiro) primeiro.focus({ preventScroll: true });
       });
     }
