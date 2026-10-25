@@ -102,11 +102,13 @@ border-bottom:1px solid var(--mi);padding-bottom:2px}
 .bento{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .ac{display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--ln);border-radius:18px;overflow:hidden}
 .ac.w2{grid-column:span 2}
-.ac .fx{display:grid;grid-template-columns:1.7fr 1fr;grid-template-rows:1fr 1fr;gap:6px;height:236px;padding:8px 8px 0}
-.ac .fx img{width:100%;height:100%;object-fit:cover;border-radius:11px;min-height:0}
-.ac .fx img:first-child{grid-row:span 2}
-.ac.w2 .fx{grid-template-columns:1.5fr 1fr 1fr;grid-template-rows:1fr}
-.ac.w2 .fx img:first-child{grid-row:auto}
+.ac .fx{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:6px;height:236px;padding:8px 8px 0;flex:none;overflow:hidden}
+/* cada foto numa célula; a foto fica presa nela (o Safari esticava a linha e cobria o número) */
+.ac .fx .cel{position:relative;display:block;min-width:0;min-height:0;overflow:hidden;border-radius:11px}
+.ac .fx .cel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ac .fx .cel:first-child{grid-row:span 2}
+.ac.w2 .fx{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+.ac.w2 .fx .cel:first-child{grid-row:auto}
 .ac .tx{padding:20px 22px 20px;display:flex;flex-direction:column;flex:1}
 .ac .l1{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
 .ac h3{font-size:20px;line-height:1.2;font-weight:600;letter-spacing:-.015em}
@@ -119,8 +121,8 @@ border-bottom:1px solid var(--mi);padding-bottom:2px}
 .ac .mm>span{white-space:nowrap}
 .ac .mm .go{margin-left:auto;color:var(--mi);display:flex;gap:6px;align-items:center}
 .ac.todo{border-color:rgba(74,222,154,.35);background:linear-gradient(180deg,rgba(74,222,154,.07),rgba(74,222,154,0) 60%),var(--s1)}
-.ac.todo .fx{grid-template-columns:repeat(6,1fr);grid-template-rows:1fr 1fr}
-.ac.todo .fx img:first-child{grid-row:auto}
+.ac.todo .fx{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+.ac.todo .fx .cel:first-child{grid-row:auto}
 .ac.todo .ct b{color:var(--mi)}
 /* destaques em linhas alternadas */
 .fl{display:grid;grid-template-columns:7fr 5fr;gap:64px;align-items:center;padding:56px 0;border-top:1px solid var(--ln)}
@@ -304,9 +306,9 @@ background:radial-gradient(70% 120% at 0% 0%,rgba(74,222,154,.10),transparent 60
  .ac.w2{grid-column:auto}
  .ac{border-radius:16px}
  .ac .fx,.ac.w2 .fx{height:150px;padding:6px 6px 0;gap:4px}
- .ac .fx img{border-radius:9px}
- .ac.todo .fx{grid-template-columns:repeat(4,1fr)}
- .ac.todo .fx img:nth-child(n+9){display:none}
+ .ac .fx .cel{border-radius:9px}
+ .ac.todo .fx{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .ac.todo .fx .cel:nth-child(n+9){display:none}
  .ac.todo .mm>span:nth-child(2){display:none}
  .ac .tx{padding:14px 16px 16px}
  .ac h3{font-size:17px}
@@ -434,8 +436,8 @@ a,button{-webkit-tap-highlight-color:transparent}
  .ac{transition:border-color .2s}
  .ac:hover{border-color:var(--ln2)}
  .ac.todo:hover{border-color:rgba(74,222,154,.6)}
- .ac .fx img,.pc .im img,.fl .im img{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
- .ac:hover .fx img,.pc a:hover .im img,.fl a.im:hover img{transform:scale(1.03)}
+ .ac .fx .cel img,.pc .im img,.fl .im img{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+ .ac:hover .fx .cel img,.pc a:hover .im img,.fl a.im:hover img{transform:scale(1.03)}
  .pc a:hover h3,.fl h3 a:hover{color:#fff;text-decoration:underline;text-decoration-color:var(--mi);text-decoration-thickness:1px;text-underline-offset:.18em}
  .chip:hover:not(:disabled){border-color:var(--tx2);color:var(--tx)}
  .dq .qm a:hover{color:var(--tx);border-color:var(--mi)}
@@ -724,4 +726,66 @@ border-bottom:1px solid rgba(74,222,154,.35);padding-bottom:3px}
  .avd dl{font-size:12px}
  .avd dt,.avd dd{padding:11px 0}
  .avd .lk{font-size:14.5px;white-space:normal}
+}
+/* o texto do cartão fica sempre por cima do mosaico */
+.ac .tx{position:relative;z-index:1;background:var(--s1)}
+.ac.todo .tx{background:transparent}
+/* lista de trabalhos: cada trabalho num bloco */
+.grade,.grade.g3{gap:44px 28px}
+.grade .pc{display:flex;min-width:0}
+.grade .pc>a{flex:1;min-width:0;padding:8px 8px 20px;background:var(--s1);border:1px solid var(--ln);border-radius:18px;transition:border-color .2s}
+.grade .pc .im{border-radius:11px;border-color:var(--ln)}
+.grade .pc .ar2,.grade .pc h3,.grade .pc .mt{padding:0 14px}
+.grade .pc .ar2{margin-top:18px}
+@media (hover:hover){.grade .pc>a:hover{border-color:var(--ln2)}}
+@media (max-width:760px){
+ .grade,.grade.g3{gap:32px}
+ .grade .pc>a{border-radius:16px;padding:6px 6px 18px}
+ .grade .pc .im{border-radius:9px}
+ .grade .pc .ar2,.grade .pc h3,.grade .pc .mt{padding:0 12px}
+ .grade .pc .ar2{margin-top:16px}
+}
+/* tablet (761 a 959): topo da área em uma coluna e áreas em faixa rolável, como no celular */
+@media (min-width:761px) and (max-width:959px){
+ .ahero{grid-template-columns:minmax(0,1fr);gap:32px;padding:40px 0 48px}
+ .ahero>div{min-width:0}
+ .ahero h1{font-size:84px}
+ .cx{grid-template-columns:minmax(0,1fr);gap:0}
+ .lat{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;padding:0;border:0;background:transparent;margin-bottom:24px;
+ -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+ .lat::-webkit-scrollbar{display:none}
+ .lat:after{content:"";flex:0 0 40px}
+ .lat p{display:none}
+ .lat a{flex:none;height:44px;padding:0 12px 0 6px;border:1px solid var(--ln);background:var(--s1);font-size:14px;gap:9px}
+ .lat a img{width:30px;height:30px}
+ .lat a.on:before{display:none}
+ .lat a.on{border-color:rgba(74,222,154,.5);order:-1}
+ .lat a.tot{display:none}
+}
+/* lista de áreas da busca: as duas colunas cabem na caixa em qualquer largura */
+@media (min-width:761px){.pal .ls{grid-template-columns:repeat(2,minmax(0,1fr))}.pal .ls.res{grid-template-columns:minmax(0,1fr)}}
+/* faixa de números alinhada com o resto da página (antes encostava na borda da tela) */
+@media (min-width:761px){.prova>div.w{padding-left:40px;padding-right:40px}}
+/* cartão "Todos os trabalhos" em duas colunas: rodapé sem estourar */
+@media (min-width:761px) and (max-width:1100px){
+ .ac.todo .mm>span:nth-child(2){display:none}
+}
+.ac .mm{flex-wrap:wrap;row-gap:8px}
+/* tablet (761 a 959): menu como no celular e busca em duas colunas enxutas */
+@media (min-width:761px) and (max-width:959px){
+ .nav .w{gap:20px}
+ .links,.lado .pil{display:none}
+ .bm{display:grid;place-items:center;width:40px;height:40px;border-radius:9px;border:1px solid var(--ln2);font-size:18px;color:var(--tx)}
+ .nav.aberto .links{display:flex;flex-direction:column;gap:0;position:absolute;left:0;right:0;top:76px;z-index:10;padding:6px 40px 18px;
+ background:var(--s1);border-bottom:1px solid var(--ln2);box-shadow:0 30px 50px -20px rgba(0,0,0,.9);font-size:16px}
+ .nav.aberto .links a{height:52px;border-bottom:1px solid var(--ln);color:var(--tx)}
+ .nav.aberto .bm{border-color:var(--tx2)}
+ .it b{white-space:normal;line-height:1.2}
+ .it div span{display:none}
+ .prova .w{grid-template-columns:repeat(5,minmax(0,1fr))}
+ .prova div{padding-left:20px}
+ .prova b{font-size:44px}
+ .prova b .ic{font-size:24px}
+ .prova span{font-size:12px}
+ .mas{columns:2}
 }
