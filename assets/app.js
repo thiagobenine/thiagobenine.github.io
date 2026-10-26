@@ -50,7 +50,7 @@
     luz.tabIndex = -1;
     luz.setAttribute("role", "dialog");
     luz.setAttribute("aria-modal", "true");
-    luz.setAttribute("aria-label", titulo ? "Imagens ampliadas: " + titulo : "Imagens ampliadas do projeto");
+    luz.setAttribute("aria-label", titulo ? "Imagens ampliadas: " + titulo : "Imagens ampliadas do trabalho");
     luz.innerHTML =
       '<p class="luz-titulo" aria-hidden="true">' + esc(titulo) + "</p>" +
       '<button type="button" class="luz-botao luz-fecha" aria-label="Fechar a imagem ampliada">' + svg('<path d="M6 6l12 12M18 6 6 18"/>', 22) + "</button>" +
@@ -852,7 +852,7 @@
     palRes.hidden = total === 0;
     if (palNada) {
       palNada.hidden = total > 0;
-      if (total === 0) palNada.textContent = "Nenhum trabalho com “" + q + "”. Tente outra palavra ou escolha uma área.";
+      if (total === 0) palNada.textContent = "Nenhum trabalho com “" + q + "”. Tente outra palavra ou uma das áreas.";
     }
   }
   if (palRes) {
