@@ -789,3 +789,16 @@ border-bottom:1px solid rgba(74,222,154,.35);padding-bottom:3px}
  .prova span{font-size:12px}
  .mas{columns:2}
 }
+/* vídeo tocável: vista principal da página do trabalho (carrega só o pôster até o play) e selo nos cartões */
+.filme{border-radius:20px;overflow:hidden;border:1px solid var(--ln2);background:#000}
+.filme video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#000}
+.filme.vert{display:flex;justify-content:center;background:var(--s1);padding:24px}
+.filme.vert video{width:auto;max-width:100%;height:min(78vh,760px);aspect-ratio:9/16;border-radius:12px}
+.selo-video{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px 0 8px;border-radius:8px;
+background:rgba(10,10,11,.84);border:1px solid var(--ln2);color:var(--tx);font:500 12px/1 "Geist Mono",monospace;pointer-events:none}
+.selo-video .ic{color:var(--mi)}
+@media (max-width:760px){
+ .filme{border-radius:14px}
+ .filme.vert{padding:0;background:#000}
+ .filme.vert video{width:100%;height:auto;max-height:80vh;border-radius:0}
+}
