@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Preview da campanha Torra de Inverno</title>
+<meta name="description" content="Página de preview com as peças HTML5 animadas de uma campanha, cada uma com a imagem de fallback, peso e botão para repetir.">
+<style>
+@font-face{font-family:"Geist";font-style:normal;font-weight:100 900;font-display:swap;src:url(../../../assets/geist-latin-normal-100-900.woff2) format("woff2")}
+@font-face{font-family:"Geist";font-style:normal;font-weight:100 900;font-display:swap;src:url(../../../assets/geist-latin-ext-normal-100-900.woff2) format("woff2");unicode-range:U+0100-02BA,U+1E00-1EFF}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:100 900;font-display:swap;src:url(../../../assets/geistmono-latin-normal-100-900.woff2) format("woff2")}
+:root{--fundo:#F2F1EE;--cartao:#FFFFFF;--tinta:#15171C;--mudo:#5B616C;--fraco:#868B94;--linha:#E2DFD8;--azul:#2D4BE0;--azulbg:#ECEFFD;--ok:#13744A;--okbg:#E3F2EA}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--fundo);color:var(--tinta);font:15px/1.5 "Geist",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:"Geist Mono",ui-monospace,monospace}
+.topo{background:#fff;border-bottom:1px solid var(--linha)}
+.topo .in{max-width:1180px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.agencia{display:flex;align-items:center;gap:11px;color:var(--tinta)}
+.agencia svg{width:34px;height:34px;flex:none}
+.agencia b{display:block;font-size:19px;font-weight:650;letter-spacing:-.015em;line-height:1.1}
+.agencia small{display:block;font-size:12.5px;color:var(--mudo);line-height:1.2}
+.topo-dir{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mudo)}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:550;white-space:nowrap}
+.chip.azul{background:var(--azulbg);color:var(--azul)}
+.chip.ok{background:var(--okbg);color:var(--ok)}
+.chip.ok::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
+main{max-width:1180px;margin:0 auto;padding:44px 24px 72px}
+.cab{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px 40px;align-items:end}
+.olho{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--mudo)}
+h1{font-size:46px;line-height:1.04;font-weight:650;letter-spacing:-.03em;margin:12px 0 12px}
+.lead{max-width:62ch;color:var(--mudo);font-size:16px}
+.acoes{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.botao{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;background:var(--tinta);color:#fff;font:600 14px/1 "Geist",system-ui,sans-serif;padding:12px 16px;cursor:pointer}
+.botao svg,.replay svg{width:15px;height:15px}
+.botao:hover{background:#2A2D35}
+.botao:focus-visible,.replay:focus-visible,.formatos a:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.resumo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px 32px;margin-top:30px;padding:18px 22px;background:var(--cartao);border:1px solid var(--linha);border-radius:14px}
+.resumo dt{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mudo)}
+.resumo dd{font-size:19px;font-weight:600;letter-spacing:-.01em;margin-top:2px}
+.formatos{display:grid;grid-template-columns:repeat(3,max-content);gap:8px;margin-top:26px}
+.formatos a{display:inline-flex;gap:8px;align-items:baseline;text-decoration:none;color:var(--tinta);background:var(--cartao);border:1px solid var(--linha);border-radius:999px;padding:6px 13px;font-size:13px}
+.formatos a span{color:var(--mudo)}
+.formatos a:hover{border-color:#C9C5BC}
+.linha-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:48px 0 4px}
+.linha-h h2{font-size:24px;font-weight:650;letter-spacing:-.02em}
+.linha-h p{color:var(--mudo);font-size:14px}
+.fmt{background:var(--cartao);border:1px solid var(--linha);border-radius:16px;padding:22px 24px 26px;margin-top:18px;scroll-margin-top:16px}
+.fmt-h{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--linha)}
+.fmt-h h3{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;font-size:18px;font-weight:650;letter-spacing:-.01em}
+.fmt-h h3 span{font-size:14.5px;font-weight:450;color:var(--mudo)}
+.peso{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--mudo)}
+.peso>span:first-child{white-space:nowrap}
+.barra{width:120px;height:6px;border-radius:99px;background:#ECEAE5;overflow:hidden}
+.barra i{display:block;height:100%;border-radius:99px;background:var(--ok)}
+.pecas{display:flex;flex-wrap:wrap;gap:28px 48px;margin-top:22px}
+.peca{display:flex;flex-direction:column;gap:10px;min-width:0;width:max(320px,calc(var(--w)*1px));max-width:100%}
+.rot{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mudo)}
+.palco{position:relative;overflow:hidden;width:calc(var(--w)*var(--s,1)*1px);height:calc(var(--h)*var(--s,1)*1px);background:#DCD8CF;box-shadow:0 0 0 1px rgba(21,23,28,.08),0 10px 28px -16px rgba(21,23,28,.45)}
+.palco iframe,.palco img{position:absolute;left:0;top:0;display:block;border:0;width:calc(var(--w)*1px);height:calc(var(--h)*1px);max-width:none;transform:scale(var(--s,1));transform-origin:0 0}
+.meta{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.meta p{font-size:13px;color:var(--mudo);line-height:1.45}
+.meta .arq{font-size:12.5px;color:var(--tinta);word-break:break-all}
+.escala{font-size:12px;color:var(--fraco)}
+.escala button{border:0;background:none;padding:0;margin-left:4px;font:600 12px/1.4 "Geist",system-ui,sans-serif;color:var(--azul);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.escala button:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.rolo{max-width:100%}
+.rolo.real{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px;margin-bottom:-4px}
+.rolo.real .palco{box-shadow:0 0 0 1px rgba(21,23,28,.08)}
+.escala:empty{display:none}
+.replay{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--tinta);border-radius:8px;padding:7px 11px;font:550 13px/1 "Geist",system-ui,sans-serif;cursor:pointer;flex:none}
+.replay:hover{background:#F6F5F2;border-color:#CFCBC2}
+.nota{margin-top:40px;padding:18px 22px;border-radius:14px;background:#E9E7E1;color:var(--mudo);font-size:14px}
+.nota b{color:var(--tinta);font-weight:600}
+footer{border-top:1px solid var(--linha);background:#fff}
+footer .in{max-width:1180px;margin:0 auto;padding:20px 24px;display:flex;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;font-size:13px;color:var(--mudo)}
+@media (max-width:860px){.cab{grid-template-columns:1fr}.acoes{align-items:flex-start}.resumo{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:860px){.formatos{display:flex;flex-wrap:wrap}}
+@media (max-width:600px){.topo .in{padding:12px 16px}.topo-dir .txt{display:none}main{padding:28px 16px 56px}h1{font-size:34px}.lead{font-size:15px}.resumo{padding:16px;gap:16px}.resumo dd{font-size:17px}.fmt{padding:16px 16px 20px;border-radius:14px}.barra{display:none}footer .in{padding:18px 16px}.linha-h{margin-top:36px}}
+@media (max-width:380px){.fmt{padding:14px 12px 18px}}
+</style>
+</head>
+<body>
+<header class="topo"><div class="in">
+ <div class="agencia"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M18 2.5L11 25" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="11" cy="25" r="5" fill="#2D4BE0"/></svg><div><b>pêndulo</b><small>agência criativa</small></div></div>
+ <div class="topo-dir"><span class="txt">Preview de campanha</span><span class="chip azul mono">Versão 1</span></div>
+</div></header>
+<main>
+ <div class="cab">
+  <div>
+   <p class="olho mono">Cliente: Alpendre Cafés Especiais</p>
+   <h1>Torra de Inverno</h1>
+   <p class="lead">Todas as peças da campanha em uma página, cada uma no tamanho real e acompanhada da imagem de fallback. Cada peça começa a animar quando aparece na tela, e o botão Repetir mostra a animação de novo quando você quiser.</p>
+  </div>
+  <div class="acoes"><button class="botao" type="button" data-replay="todas"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.4 1.9v3.2h3.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Repetir todas</button></div>
+ </div>
+ <dl class="resumo">
+  <div><dt class="mono">Formatos</dt><dd>6</dd></div>
+  <div><dt class="mono">Maior peça</dt><dd>14,0 KB</dd></div>
+  <div><dt class="mono">Limite por peça</dt><dd>150 KB</dd></div>
+  <div><dt class="mono">Duração</dt><dd>10 s</dd></div>
+ </dl>
+ <nav class="formatos" aria-label="Formatos"><a href="#f-300x250" class="mono">300 × 250<span>Retângulo médio</span></a><a href="#f-300x600" class="mono">300 × 600<span>Meia página</span></a><a href="#f-160x600" class="mono">160 × 600<span>Arranha-céu largo</span></a><a href="#f-728x90" class="mono">728 × 90<span>Super banner</span></a><a href="#f-970x250" class="mono">970 × 250<span>Billboard</span></a><a href="#f-320x50" class="mono">320 × 50<span>Banner mobile</span></a></nav>
+ <div class="linha-h"><h2>Linha criativa 1: Aroma que aquece</h2><p>6 formatos IAB, HTML5 com clickTag</p></div>
+
+<section class="fmt" id="f-300x250">
+ <div class="fmt-h">
+  <h3><span class="mono" style="font-size:18px;font-weight:600;color:var(--tinta)">300 × 250</span><span>Retângulo médio</span></h3>
+  <div class="peso"><span>13,5 KB de 150 KB</span><span class="barra" aria-hidden="true"><i style="width:9.0%"></i></span><span class="chip ok">Dentro do limite</span></div>
+ </div>
+ <div class="pecas">
+  <figure class="peca" style="--w:300">
+   <figcaption class="rot">HTML5 animado</figcaption>
+   <div class="rolo"><div class="palco" style="--w:300;--h:250"><iframe id="q-300x250" data-src="pecas/alpendre_inverno_l1_300x250/index.html" width="300" height="250" scrolling="no" title="Peça 300 × 250 animada"></iframe></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_300x250.zip</p><p>300 × 250 px · 13,5 KB · 10 s, uma execução</p></div><button class="replay" type="button" data-replay="q-300x250"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.4 1.9v3.2h3.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Repetir</button></div>
+  </figure>
+  <figure class="peca" style="--w:300">
+   <figcaption class="rot">Imagem de fallback</figcaption>
+   <div class="rolo"><div class="palco" style="--w:300;--h:250"><img src="fallback/alpendre_inverno_l1_300x250.jpg" width="300" height="250" alt="Quadro final da peça 300 × 250"></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_300x250.jpg</p><p>300 × 250 px · 19,9 KB · JPG estático</p></div></div>
+  </figure>
+ </div>
+</section>
+<section class="fmt" id="f-300x600">
+ <div class="fmt-h">
+  <h3><span class="mono" style="font-size:18px;font-weight:600;color:var(--tinta)">300 × 600</span><span>Meia página</span></h3>
+  <div class="peso"><span>13,8 KB de 150 KB</span><span class="barra" aria-hidden="true"><i style="width:9.2%"></i></span><span class="chip ok">Dentro do limite</span></div>
+ </div>
+ <div class="pecas">
+  <figure class="peca" style="--w:300">
+   <figcaption class="rot">HTML5 animado</figcaption>
+   <div class="rolo"><div class="palco" style="--w:300;--h:600"><iframe id="q-300x600" data-src="pecas/alpendre_inverno_l1_300x600/index.html" width="300" height="600" scrolling="no" title="Peça 300 × 600 animada"></iframe></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_300x600.zip</p><p>300 × 600 px · 13,8 KB · 10 s, uma execução</p></div><button class="replay" type="button" data-replay="q-300x600"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.4 1.9v3.2h3.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Repetir</button></div>
+  </figure>
+  <figure class="peca" style="--w:300">
+   <figcaption class="rot">Imagem de fallback</figcaption>
+   <div class="rolo"><div class="palco" style="--w:300;--h:600"><img src="fallback/alpendre_inverno_l1_300x600.jpg" width="300" height="600" alt="Quadro final da peça 300 × 600"></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_300x600.jpg</p><p>300 × 600 px · 32,9 KB · JPG estático</p></div></div>
+  </figure>
+ </div>
+</section>
+<section class="fmt" id="f-160x600">
+ <div class="fmt-h">
+  <h3><span class="mono" style="font-size:18px;font-weight:600;color:var(--tinta)">160 × 600</span><span>Arranha-céu largo</span></h3>
+  <div class="peso"><span>13,6 KB de 150 KB</span><span class="barra" aria-hidden="true"><i style="width:9.0%"></i></span><span class="chip ok">Dentro do limite</span></div>
+ </div>
+ <div class="pecas">
+  <figure class="peca" style="--w:160">
+   <figcaption class="rot">HTML5 animado</figcaption>
+   <div class="rolo"><div class="palco" style="--w:160;--h:600"><iframe id="q-160x600" data-src="pecas/alpendre_inverno_l1_160x600/index.html" width="160" height="600" scrolling="no" title="Peça 160 × 600 animada"></iframe></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_160x600.zip</p><p>160 × 600 px · 13,6 KB · 10 s, uma execução</p></div><button class="replay" type="button" data-replay="q-160x600"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.4 1.9v3.2h3.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Repetir</button></div>
+  </figure>
+  <figure class="peca" style="--w:160">
+   <figcaption class="rot">Imagem de fallback</figcaption>
+   <div class="rolo"><div class="palco" style="--w:160;--h:600"><img src="fallback/alpendre_inverno_l1_160x600.jpg" width="160" height="600" alt="Quadro final da peça 160 × 600"></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_160x600.jpg</p><p>160 × 600 px · 22,9 KB · JPG estático</p></div></div>
+  </figure>
+ </div>
+</section>
+<section class="fmt" id="f-728x90">
+ <div class="fmt-h">
+  <h3><span class="mono" style="font-size:18px;font-weight:600;color:var(--tinta)">728 × 90</span><span>Super banner</span></h3>
+  <div class="peso"><span>13,6 KB de 150 KB</span><span class="barra" aria-hidden="true"><i style="width:9.1%"></i></span><span class="chip ok">Dentro do limite</span></div>
+ </div>
+ <div class="pecas">
+  <figure class="peca" style="--w:728">
+   <figcaption class="rot">HTML5 animado</figcaption>
+   <div class="rolo"><div class="palco" style="--w:728;--h:90"><iframe id="q-728x90" data-src="pecas/alpendre_inverno_l1_728x90/index.html" width="728" height="90" scrolling="no" title="Peça 728 × 90 animada"></iframe></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_728x90.zip</p><p>728 × 90 px · 13,6 KB · 10 s, uma execução</p></div><button class="replay" type="button" data-replay="q-728x90"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.4 1.9v3.2h3.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Repetir</button></div>
+  </figure>
+  <figure class="peca" style="--w:728">
+   <figcaption class="rot">Imagem de fallback</figcaption>
+   <div class="rolo"><div class="palco" style="--w:728;--h:90"><img src="fallback/alpendre_inverno_l1_728x90.jpg" width="728" height="90" alt="Quadro final da peça 728 × 90"></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_728x90.jpg</p><p>728 × 90 px · 17,6 KB · JPG estático</p></div></div>
+  </figure>
+ </div>
+</section>
+<section class="fmt" id="f-970x250">
+ <div class="fmt-h">
+  <h3><span class="mono" style="font-size:18px;font-weight:600;color:var(--tinta)">970 × 250</span><span>Billboard</span></h3>
+  <div class="peso"><span>14,0 KB de 150 KB</span><span class="barra" aria-hidden="true"><i style="width:9.3%"></i></span><span class="chip ok">Dentro do limite</span></div>
+ </div>
+ <div class="pecas">
+  <figure class="peca" style="--w:970">
+   <figcaption class="rot">HTML5 animado</figcaption>
+   <div class="rolo"><div class="palco" style="--w:970;--h:250"><iframe id="q-970x250" data-src="pecas/alpendre_inverno_l1_970x250/index.html" width="970" height="250" scrolling="no" title="Peça 970 × 250 animada"></iframe></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_970x250.zip</p><p>970 × 250 px · 14,0 KB · 10 s, uma execução</p></div><button class="replay" type="button" data-replay="q-970x250"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.4 1.9v3.2h3.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Repetir</button></div>
+  </figure>
+  <figure class="peca" style="--w:970">
+   <figcaption class="rot">Imagem de fallback</figcaption>
+   <div class="rolo"><div class="palco" style="--w:970;--h:250"><img src="fallback/alpendre_inverno_l1_970x250.jpg" width="970" height="250" alt="Quadro final da peça 970 × 250"></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_970x250.jpg</p><p>970 × 250 px · 37,4 KB · JPG estático</p></div></div>
+  </figure>
+ </div>
+</section>
+<section class="fmt" id="f-320x50">
+ <div class="fmt-h">
+  <h3><span class="mono" style="font-size:18px;font-weight:600;color:var(--tinta)">320 × 50</span><span>Banner mobile</span></h3>
+  <div class="peso"><span>12,9 KB de 150 KB</span><span class="barra" aria-hidden="true"><i style="width:8.6%"></i></span><span class="chip ok">Dentro do limite</span></div>
+ </div>
+ <div class="pecas">
+  <figure class="peca" style="--w:320">
+   <figcaption class="rot">HTML5 animado</figcaption>
+   <div class="rolo"><div class="palco" style="--w:320;--h:50"><iframe id="q-320x50" data-src="pecas/alpendre_inverno_l1_320x50/index.html" width="320" height="50" scrolling="no" title="Peça 320 × 50 animada"></iframe></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_320x50.zip</p><p>320 × 50 px · 12,9 KB · 10 s, uma execução</p></div><button class="replay" type="button" data-replay="q-320x50"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.4 1.9v3.2h3.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Repetir</button></div>
+  </figure>
+  <figure class="peca" style="--w:320">
+   <figcaption class="rot">Imagem de fallback</figcaption>
+   <div class="rolo"><div class="palco" style="--w:320;--h:50"><img src="fallback/alpendre_inverno_l1_320x50.jpg" width="320" height="50" alt="Quadro final da peça 320 × 50"></div></div>
+   <p class="escala"></p>
+   <div class="meta"><div><p class="arq mono">alpendre_inverno_l1_320x50.jpg</p><p>320 × 50 px · 6,7 KB · JPG estático</p></div></div>
+  </figure>
+ </div>
+</section>
+ <p class="nota"><b>Exemplo de demonstração.</b> A agência e a marca desta página são fictícias, criadas só para mostrar como fica a página de preview de uma campanha.</p>
+</main>
+<footer><div class="in"><span>pêndulo, agência criativa</span><span>Atualizado em 06/11/2026</span></div></footer>
+<script>
+(function(){
+var palcos=[].slice.call(document.querySelectorAll('.palco'));
+function ajusta(){palcos.forEach(function(p){
+ var rolo=p.parentNode;var area=p.closest('.pecas');var max=area.clientWidth;var w=+p.style.getPropertyValue('--w');
+ var s=Math.min(1,max/w);var real=rolo.classList.contains('real')&&s<1;if(s>=1)rolo.classList.remove('real');
+ p.style.setProperty('--s',(s<1&&!real)?s.toFixed(4):1);
+ var n=rolo.parentNode.querySelector('.escala');if(!n)return;
+ if(s>=1){n.textContent='';return;}
+ n.textContent=real?'No tamanho real. Arraste para o lado para ver a peça inteira.':('Exibido a '+Math.round(s*100)+'% para caber na tela. O arquivo tem o tamanho real.');
+ var b=document.createElement('button');b.type='button';b.setAttribute('data-real','');b.textContent=real?'Ajustar à tela':'Ver no tamanho real';n.appendChild(b);
+});}
+ajusta();window.addEventListener('resize',ajusta);
+var quadros=[].slice.call(document.querySelectorAll('iframe[data-src]'));
+function toca(f){f.src=f.getAttribute('data-src')+'?r='+Date.now();}
+if('IntersectionObserver' in window){
+ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&!e.target.src){toca(e.target);io.unobserve(e.target);}});},{threshold:0.35});
+ quadros.forEach(function(f){io.observe(f);});
+}else{quadros.forEach(toca);}
+document.addEventListener('click',function(ev){
+ var t=ev.target.closest('[data-real]');if(t){var r=t.closest('.peca').querySelector('.rolo');r.classList.toggle('real');ajusta();if(r.classList.contains('real'))r.scrollLeft=0;return;}
+ var b=ev.target.closest('[data-replay]');if(!b)return;
+ if(b.getAttribute('data-replay')==='todas'){quadros.forEach(toca);}
+ else{var f=document.getElementById(b.getAttribute('data-replay'));if(f)toca(f);}
+});
+})();
+</script>
+</body>
+</html>
