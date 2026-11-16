@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
 Sitemap: https://thiagobenine.github.io/sitemap.xml
+Sitemap: https://thiagobenine.github.io/en/sitemap.xml
